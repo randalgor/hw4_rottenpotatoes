@@ -34,6 +34,8 @@ class MoviesController < ApplicationController
       redirect_to :sort => sort, :ratings => @selected_ratings and return
     end
     @movies = Movie.find_all_by_rating(@selected_ratings.keys, ordering)
+    
+    @message = flash[:message]
   end
 
   def new
@@ -55,6 +57,17 @@ class MoviesController < ApplicationController
     @movie.update_attributes!(params[:movie])
     flash[:notice] = "#{@movie.title} was successfully updated."
     redirect_to movie_path(@movie)
+  end
+  
+  def similar
+    @movie = Movie.find params[:id]
+    
+    if @movie.director == nil or @movie.director == ''
+      flash[:message] = "'#{@movie.title}' has no director info";
+      redirect_to movies_path and return
+    else
+      @directorMovieList = Movie.find_all_by_director(@movie.director)
+    end
   end
 
   def destroy
